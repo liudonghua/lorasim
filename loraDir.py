@@ -273,9 +273,9 @@ class myNode():
 
         # graphics for node
         #global graphics
-        if (graphics == 1):
-            global ax
-            ax.add_artist(plt.Circle((self.x, self.y), 2, fill=True, color='blue'))
+        # if (graphics == 1):
+        #     global ax
+        #     ax.add_artist(plt.Circle((self.x, self.y), 1, fill=True, color='blue'))
             
 #
 # this function creates a packet (associated with a node)
@@ -340,14 +340,14 @@ class myPacket():
             print("Prx:", Prx)
             self.cr = 1
             self.bw = 125
-            self.sf  = random.choice([7,7,7,7,7,7,7,7,7,7,7,8,8,8,8,8,8,9,9,9,9,10,10,11,12])        
+            #self.sf  = random.choice([7,7,7,7,7,7,7,7,7,7,7,8,8,8,8,8,8,9,9,9,9,10,10,11,12])        
             #self.sf = random.choice([12,11,11,10,10,10,10,9,9,9,9,9,9,9,9,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8])
             #self.sf = random.choice([8,9,10,11,12])
             #self.sf = random.choice([8,8,8,9,9,9,10,10,11,12])
             #self.sf = random.choice([12,11,11,10,10,10,9,9,9,9,8,8,8,8,8])
             #self.sf  = random.choice([8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,9,9,9,9,9,9,9,9,9,10,10,10,10,10,11,11,11,12])
-            #self.sf  = random.choice([8,8,8,8,8,8,8,8,8,8,8,8,9,9,9,9,9,9,10,10,10,10,11,11,12])
-
+            self.sf  = random.choice([8,8,8,8,8,8,8,8,8,8,8,8,9,9,9,9,9,9,10,10,10,10,11,11,12])
+            #self.sf = 8
             at = airtime(self.sf, self.cr, plen, self.bw)
             if at < minairtime:
                 minairtime = at
@@ -410,7 +410,7 @@ def transmit(env,node):
             sensitivity = sensi[node.packet.sf - 7, [125,250,500].index(node.packet.bw) + 1]
             if node.packet.rssi < sensitivity:
                 print("node {}: packet will be lost".format(node.nodeid))
-                node.packet.lost = True
+                node.packet.lost = False  # origin True
             else:
                     node.packet.lost = False
                     # adding packet if no collision
@@ -440,12 +440,12 @@ def transmit(env,node):
             global ax
             global plt
             if(node.packet.collided == 1):
-                ax.add_artist(plt.Circle((node.x, node.y), 2, fill=True, color='red'))
+                ax.add_artist(plt.Circle((node.x + random.choice([-8,-4,0,4,8]), node.y + random.choice([-8,-4,0,4,8])), 1, fill=True, color='red'))
             elif(node.packet.lost == True):
-                ax.add_artist(plt.Circle((node.x, node.y), 2, fill=True, color='yellow'))
+                ax.add_artist(plt.Circle((node.x + random.choice([-8,-4,0,4,8]), node.y + random.choice([-8,-4,0,4,8])), 1, fill=True, color='yellow'))
             else:
-                ax.add_artist(plt.Circle((node.x, node.y), 2, fill=True, color='blue'))
-            plt.pause(0.001)
+                ax.add_artist(plt.Circle((node.x + random.choice([-8,-4,0,4,8]), node.y + random.choice([-8,-4,0,4,8])), 1, fill=True, color='blue'))
+            
         # complete packet has been received by base station
         # can remove it
         if (node in packetsAtBS):
@@ -579,7 +579,7 @@ if __name__ == "__main__":
 
     # start simulation
     env.run(until=simtime)
-
+    plt.pause(0.001)
     # print(stats and save into file
     print("nrCollisions ", nrCollisions)
 
