@@ -294,13 +294,6 @@ class myPacket():
         self.nodeid = nodeid
         self.txpow = Ptx
 
-        # randomize configuration values
-        #self.sf = random.choice([12,11,11,10,10,10,10,9,9,9,9,9,9,9,9,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8])
-        #self.sf = random.choice([8,9,10,11,12])
-        #self.sf = random.choice([8,8,8,9,9,9,10,10,11,12])
-        #self.sf = random.choice([12,11,11,10,10,10,9,9,9,9,8,8,8,8,8])
-        #self.sf  = random.choice([8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,9,9,9,9,9,9,9,9,9,10,10,10,10,10,11,11,11,12])
-#        self.sf  = random.choice([8,8,8,8,8,8,8,8,8,8,8,8,9,9,9,9,9,9,10,10,10,10,11,11,12])
         self.cr = random.randint(1,4)
         #self.bw = random.choice([125, 250, 500])
         
@@ -407,19 +400,19 @@ def transmit(env,node):
         if (node in packetsAtBS):
             print("ERROR: packet already in")
         else:
-            sensitivity = sensi[node.packet.sf - 7, [125,250,500].index(node.packet.bw) + 1]
-            if node.packet.rssi < sensitivity:
-                print("node {}: packet will be lost".format(node.nodeid))
-                node.packet.lost = False  # origin True
+            #sensitivity = sensi[node.packet.sf - 7, [125,250,500].index(node.packet.bw) + 1]
+            # if node.packet.rssi < sensitivity:
+            #     print("node {}: packet will be lost".format(node.nodeid))
+            #     node.packet.lost = False  # origin True
+            # else:
+            node.packet.lost = False
+            # adding packet if no collision
+            if (checkcollision(node.packet)==1):
+                node.packet.collided = 1
             else:
-                    node.packet.lost = False
-                    # adding packet if no collision
-                    if (checkcollision(node.packet)==1):
-                        node.packet.collided = 1
-                    else:
-                        node.packet.collided = 0
-                    packetsAtBS.append(node)
-                    node.packet.addTime = env.now
+                node.packet.collided = 0
+            packetsAtBS.append(node)
+            node.packet.addTime = env.now
 
         yield env.timeout(node.packet.rectime)
 
@@ -538,7 +531,7 @@ if __name__ == "__main__":
         minsensi = sensi[5,2]  # 5th row is SF12, 2nd column is BW125
     elif experiment == 2:
         minsensi = -112.0   # no experiments, so value from datasheet
-    elif experiment == 3:
+    elif experiment in [3,5]:
         minsensi = np.amin(sensi) ## Experiment 3 can use any setting, so take minimum
     Lpl = Ptx - minsensi
     print("amin", minsensi, "Lpl", Lpl)
@@ -560,7 +553,8 @@ if __name__ == "__main__":
         
         ax.add_artist(plt.Circle((bsx, bsy), 3, fill=True, color='green'))
         ax.add_artist(plt.Circle((bsx, bsy), maxDist, fill=False, color='green'))
-        plt.pause(0.01)
+        
+        
 
     for i in range(0,nrNodes):
         # myNode takes period (in ms), base station id packetlen (in Bytes)
@@ -576,10 +570,11 @@ if __name__ == "__main__":
         plt.draw()
         #plt.ioff()
         plt.show()
+        plt.pause(2)
 
     # start simulation
     env.run(until=simtime)
-    plt.pause(0.001)
+    
     # print(stats and save into file
     print("nrCollisions ", nrCollisions)
 
@@ -609,6 +604,7 @@ if __name__ == "__main__":
 
     # this can be done to keep graphics visible
     if (graphics == 1):
+        plt.pause(0.001)
         sys.stdin.read()
         #plt.ioff()
 

@@ -60,7 +60,7 @@ import os
 from matplotlib.patches import Rectangle
 
 # turn on/off graphics
-graphics = 0
+graphics = 1
 
 # do the full collision check
 full_collision = False
@@ -92,8 +92,8 @@ sf12 = np.array([12,-133.25,-132.25,-132.25])
 def checkcollision(packet):
     col = 0 # flag needed since there might be several collisions for packet
     # lost packets don't collide
-    if packet.lost:
-       return 0
+    #if packet.lost:
+    #   return 0
     if packetsAtBS[packet.bs]:
         for other in packetsAtBS[packet.bs]:
             if other.id != packet.nodeid:
@@ -125,9 +125,9 @@ def checkcollision(packet):
 #        |f1-f2| <= 60 kHz if f1 or f2 has bw 250
 #        |f1-f2| <= 30 kHz if f1 or f2 has bw 125
 def frequencyCollision(p1,p2):
-    if (abs(p1.freq-p2.freq)<=120 and (p1.bw==500 or p2.freq==500)):
+    if (abs(p1.freq-p2.freq)<=120 and (p1.bw==500 or p2.bw==500)):
         return True
-    elif (abs(p1.freq-p2.freq)<=60 and (p1.bw==250 or p2.freq==250)):
+    elif (abs(p1.freq-p2.freq)<=60 and (p1.bw==250 or p2.bw==250)):
         return True
     else:
         if (abs(p1.freq-p2.freq)<=30):
@@ -316,10 +316,7 @@ class myNode():
         self.sent = 0
 
         # graphics for node
-        global graphics
-        if (graphics == 1):
-            global ax
-            ax.add_artist(plt.Circle((self.x, self.y), 2, fill=True, color='blue'))
+
 
 #
 # this function creates a packet (associated with a node)
@@ -387,13 +384,18 @@ class myPacket():
                             minsf = self.sf
                             minbw = self.bw
 
-            self.rectime = minairtime
-            self.sf = minsf
-            self.bw = minbw
-            if (minairtime == 9999):
-                print "does not reach base station"
-                exit(-1)
-
+            
+            self.cr = 1
+            self.bw = 125
+            #self.sf  = random.choice([7,7,7,7,7,7,7,7,7,7,7,8,8,8,8,8,8,9,9,9,9,10,10,11,12])        
+            #self.sf = random.choice([12,11,11,10,10,10,10,9,9,9,9,9,9,9,9,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8])
+            #self.sf = random.choice([8,9,10,11,12])
+            #self.sf = random.choice([8,8,8,9,9,9,10,10,11,12])
+            #self.sf = random.choice([12,11,11,10,10,10,9,9,9,9,8,8,8,8,8])
+            #self.sf  = random.choice([8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,9,9,9,9,9,9,9,9,9,10,10,10,10,10,11,11,11,12])
+            self.sf  = random.choice([8,8,8,8,8,8,8,8,8,8,8,8,9,9,9,9,9,9,10,10,10,10,11,11,12])
+            
+            
         # transmission range, needs update XXX
         self.transRange = 150
         self.pl = plen
@@ -401,7 +403,7 @@ class myPacket():
         self.arriveTime = 0
         self.rssi = Prx
         # frequencies: lower bound + number of 61 Hz steps
-        self.freq = 860000000 + random.randint(0,2622950)
+        
 
         # for certain experiments override these and
         # choose some random frequences
@@ -410,6 +412,7 @@ class myPacket():
         else:
             self.freq = 860000000
 
+        self.freq = random.choice([867500000, 867700000, 867900000,868100000,868300000,868500000,868700000,868900000])
         self.rectime = airtime(self.sf,self.cr,self.pl,self.bw)
         # denote if packet is collided
         self.collided = 0
@@ -458,20 +461,28 @@ def transmit(env,node):
 
         # if packet did not collide, add it in list of received packets
         # unless it is already in
+        collided = True
         for bs in range(0, nrBS):
-            if node.packet[bs].lost:
-                lostPackets.append(node.packet[bs].seqNr)
-            else:
-                if node.packet[bs].collided == 0:
-                    packetsRecBS[bs].append(node.packet[bs].seqNr)
-                    if (recPackets):
-                        if (recPackets[-1] != node.packet[bs].seqNr):
-                            recPackets.append(node.packet[bs].seqNr)
-                    else:
+            # if node.packet[bs].lost:
+            #     lostPackets.append(node.packet[bs].seqNr)
+            # else:
+            
+            if node.packet[bs].collided == 0:
+                collided = False
+                packetsRecBS[bs].append(node.packet[bs].seqNr)
+                if (recPackets):
+                    if (recPackets[-1] != node.packet[bs].seqNr):
                         recPackets.append(node.packet[bs].seqNr)
                 else:
-                    # XXX only for debugging
-                    collidedPackets.append(node.packet[bs].seqNr)
+                    recPackets.append(node.packet[bs].seqNr)
+            else:
+                # XXX only for debugging
+                collidedPackets.append(node.packet[bs].seqNr)
+        if (graphics == 1):
+            if(collided == True):
+                ax.add_artist(plt.Circle((node.x + random.choice([-8,-4,0,4,8]), node.y + random.choice([-8,-4,0,4,8])), 1, fill=True, color='red'))
+            else:
+                ax.add_artist(plt.Circle((node.x + random.choice([-8,-4,0,4,8]), node.y + random.choice([-8,-4,0,4,8])), 1, fill=True, color='blue'))
 
         # complete packet has been received by base station
         # can remove it
@@ -487,14 +498,16 @@ def transmit(env,node):
 #
 
 # get arguments
-if len(sys.argv) >= 6:
+if len(sys.argv) >= 7:
     nrNodes = int(sys.argv[1])
     avgSendTime = int(sys.argv[2])
     experiment = int(sys.argv[3])
     simtime = int(sys.argv[4])
     nrBS = int(sys.argv[5])
-    if len(sys.argv) > 6:
-        full_collision = bool(int(sys.argv[6]))
+    plen = int(sys.argv[6])
+
+    if len(sys.argv) > 7:
+        full_collision = bool(int(sys.argv[7]))
     print "Nodes:", nrNodes
     print "AvgSendTime (exp. distributed):",avgSendTime
     print "Experiment: ", experiment
@@ -528,7 +541,7 @@ packetSeq = 0
 # list of received packets
 recPackets=[]
 collidedPackets=[]
-lostPackets = []
+#lostPackets = []
 
 Ptx = 14
 gamma = 2.08
@@ -590,10 +603,12 @@ for i in range(0,nrBS):
     packetsAtBS.append([])
     packetsRecBS.append([])
 
+
+
 for i in range(0,nrNodes):
     # myNode takes period (in ms), base station id packetlen (in Bytes)
     # 1000000 = 16 min
-    node = myNode(i, avgSendTime,20)
+    node = myNode(i, avgSendTime,plen)
     nodes.append(node)
     env.process(transmit(env,node))
 
@@ -603,6 +618,8 @@ if (graphics == 1):
     plt.ylim([0, ymax])
     plt.draw()
     plt.show()
+    plt.pause(2)
+    
 
 # store nodes and basestation locations
 with open('nodes.txt', 'w') as nfile:
@@ -622,7 +639,8 @@ env.run(until=simtime)
 #print recPackets
 print "nr received packets", len(recPackets)
 print "nr collided packets", len(collidedPackets)
-print "nr lost packets", len(lostPackets)
+#print "nr lost packets", len(lostPackets)
+
 
 #print "sent packets: ", sent
 #print "sent packets-collisions: ", sent-nrCollisions
@@ -639,11 +657,12 @@ print "DER:", der
 
 # this can be done to keep graphics visible
 if (graphics == 1):
+    plt.pause(0.1)
     sys.stdin.read()
 
 # save experiment data into a dat file that can be read by e.g. gnuplot
 # name of file would be:  exp0.dat for experiment 0
-fname = "exp" + str(experiment) + "BS" + str(nrBS) + ".dat"
+fname = "exp" + str(experiment) + "BS" + str(nrBS) +"t"+avgSendTime+"len"+plen+"nodes"+nrNodes+ ".dat"
 print fname
 if os.path.isfile(fname):
     res = "\n" + str(nrNodes) + " " + str(der)
@@ -653,7 +672,7 @@ with open(fname, "a") as myfile:
     myfile.write(res)
 myfile.close()
 
-exit(-1)
+exit(0)
 #below not updated
 
 

@@ -5,11 +5,119 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Current File",
+            "name": "1 bs 2000 nodes 5 mins",
             "type": "python",
             "request": "launch",
             "program": "${file}",
-            "args": ["2000","30000","3","3000000","18","1"],
+            "args": ["2000","300000","3","600000","1","33"],
+            "console": "integratedTerminal",
+            "pythonPath" : "/home/liudh/.virtualenvs/lorasim/bin/python"
+        },
+        {
+            "name": "2 bss 2000 nodes 5 mins",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "args": ["2000","300000","3","600000","2","33"],
+            "console": "integratedTerminal",
+            "pythonPath" : "/home/liudh/.virtualenvs/lorasim/bin/python"
+        },
+        {
+            "name": "4 bss 2000 nodes 5 mins",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "args": ["2000","300000","3","600000","4","33"],
+            "console": "integratedTerminal",
+            "pythonPath" : "/home/liudh/.virtualenvs/lorasim/bin/python"
+        },
+        {
+            "name": "8 bss 2000 nodes 5 mins",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "args": ["2000","300000","3","600000","8","33"],
+            "console": "integratedTerminal",
+            "pythonPath" : "/home/liudh/.virtualenvs/lorasim/bin/python"
+        },
+        {
+            "name": "8 bss 2000 nodes 1mins",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "args": ["2000","60000","3","480000","8","33"],
+            "console": "integratedTerminal",
+            "pythonPath" : "/home/liudh/.virtualenvs/lorasim/bin/python"
+        }, 
+        {
+            "name": "8 bss 2000 nodes 15 seconds",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "args": ["2000","15000","3","120000","8","33"],
+            "console": "integratedTerminal",
+            "pythonPath" : "/home/liudh/.virtualenvs/lorasim/bin/python"
+        },
+        {
+            "name": "2000 nodes 15 mins",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "args": ["2000","900000","3","2700000","33"],
+            "console": "integratedTerminal",
+            "pythonPath" : "/home/liudh/.virtualenvs/lorasim/bin/python"
+        },
+        {
+            "name": "2000 nodes 10 mins",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "args": ["2000","600000","3","2700000","33"],
+            "console": "integratedTerminal",
+            "pythonPath" : "/home/liudh/.virtualenvs/lorasim/bin/python"
+        },
+        {
+            "name": "2000 nodes 5 mins",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "args": ["2000","300000","3","300000","33"],
+            "console": "integratedTerminal",
+            "pythonPath" : "/home/liudh/.virtualenvs/lorasim/bin/python"
+        },
+        {
+            "name": "50 nodes 1 mins",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "args": ["50","60000","3","2700000","33"],
+            "console": "integratedTerminal",
+            "pythonPath" : "/home/liudh/.virtualenvs/lorasim/bin/python"
+        },
+        {
+            "name": "50 nodes 24s",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "args": ["50","24000","3","2700000","33"],
+            "console": "integratedTerminal",
+            "pythonPath" : "/home/liudh/.virtualenvs/lorasim/bin/python"
+        },
+        {
+            "name": "50 nodes 3mins",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "args": ["50","180000","3","3600000","33"],
+            "console": "integratedTerminal",
+            "pythonPath" : "/home/liudh/.virtualenvs/lorasim/bin/python"
+        },
+        {
+            "name": "50 nodes 5mins",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "args": ["50","300000","3","2700000","33"],
             "console": "integratedTerminal",
             "pythonPath" : "/home/liudh/.virtualenvs/lorasim/bin/python"
         }
